@@ -1,0 +1,773 @@
+# 🏥 MediCare AI - Complete Frontend Generation Prompt
+
+**Copy this entire prompt into Cursor/v0/Claude to generate a production-ready medical AI assistant frontend.**
+
+---
+
+## 🎯 Project Overview
+
+Build a modern, professional, and fully functional frontend for **MediCare AI** - a medical AI assistant API for Cameroon. The interface should feel trustworthy, calming, and healthcare-focused with a cool, contemporary aesthetic.
+
+---
+
+## 🛠️ Technology Stack
+
+### Core Framework
+- **React 18+** with **Next.js 14** (App Router)
+- **TypeScript** for type safety
+- **TailwindCSS** for styling
+- **shadcn/ui** for component library
+
+### Additional Libraries
+- **Framer Motion** - smooth page transitions and animations
+- **Lucide React** - modern icon set
+- **React Hook Form** - form management
+- **Zod** - validation schemas
+- **Axios** or **Fetch API** - API communication
+- **React Hot Toast** - elegant notifications
+
+---
+
+## 🎨 Design System
+
+### Color Palette
+```typescript
+// tailwind.config.ts
+colors: {
+  primary: {
+    DEFAULT: '#2563EB', // Cool Blue
+    50: '#EFF6FF',
+    100: '#DBEAFE',
+    500: '#2563EB',
+    600: '#1D4ED8',
+    700: '#1E40AF',
+  },
+  secondary: {
+    DEFAULT: '#0EA5E9', // Teal Blue
+    500: '#0EA5E9',
+    600: '#0284C7',
+  },
+  accent: {
+    DEFAULT: '#14B8A6', // Teal Green
+    500: '#14B8A6',
+    600: '#0D9488',
+  },
+  background: '#F9FAFB',
+  text: {
+    primary: '#1E293B',
+    secondary: '#64748B',
+  }
+}
+```
+
+### Typography
+- **Headings:** Inter or Poppins (bold, semi-bold)
+- **Body:** Inter or System Font Stack
+- **Sizes:** text-sm, text-base, text-lg, text-xl, text-2xl, text-3xl, text-4xl
+
+### Spacing & Layout
+- Container max-width: `max-w-7xl`
+- Card padding: `p-6` or `p-8`
+- Border radius: `rounded-2xl` for cards, `rounded-lg` for inputs
+- Shadows: `shadow-sm`, `shadow-md`, `shadow-lg`
+
+---
+
+## 📐 Application Structure
+
+### Main Layout
+```
+┌─────────────────────────────────────────────────┐
+│              Header (Logo + Nav)                │
+├─────────────────────────────────────────────────┤
+│                                                 │
+│              Tab Navigation Bar                 │
+│   [Welcome] [Chat] [Text] [Image] [Research]   │
+│                                                 │
+├─────────────────────────────────────────────────┤
+│                                                 │
+│                                                 │
+│              Active Tab Content                 │
+│              (Main Content Area)                │
+│                                                 │
+│                                                 │
+├─────────────────────────────────────────────────┤
+│              Footer (Optional)                  │
+└─────────────────────────────────────────────────┘
+```
+
+### Component Hierarchy
+```
+src/
+├── app/
+│   ├── layout.tsx (root layout)
+│   └── page.tsx (main application)
+├── components/
+│   ├── layout/
+│   │   ├── Header.tsx
+│   │   ├── TabNavigation.tsx
+│   │   └── Footer.tsx
+│   ├── tabs/
+│   │   ├── WelcomeTab.tsx
+│   │   ├── ChatTab.tsx
+│   │   ├── TextAnalysisTab.tsx
+│   │   ├── ImageAnalysisTab.tsx
+│   │   └── ResearchTab.tsx
+│   ├── shared/
+│   │   ├── LoadingSpinner.tsx
+│   │   ├── ErrorMessage.tsx
+│   │   ├── LanguageToggle.tsx
+│   │   ├── DisclaimerBanner.tsx
+│   │   └── AnalysisResultCard.tsx
+│   └── ui/ (shadcn components)
+├── lib/
+│   ├── api.ts (API client)
+│   ├── types.ts (TypeScript interfaces)
+│   └── utils.ts
+└── hooks/
+    ├── useApi.ts
+    └── useLanguage.ts
+```
+
+---
+
+## 🔌 API Integration
+
+### API Configuration
+```typescript
+// lib/api.ts
+const API_BASE_URL = 'https://medicare-ai-4.onrender.com';
+
+export const apiClient = {
+  // Health check
+  healthCheck: async () => {
+    const response = await fetch(`${API_BASE_URL}/api/health`);
+    return response.json();
+  },
+  
+  // Chat
+  chat: async (message: string, language: string = 'en') => {
+    const response = await fetch(`${API_BASE_URL}/api/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message, language })
+    });
+    return response.json();
+  },
+  
+  // Text analysis
+  analyzeText: async (text: string, context: string = '', language: string = 'en') => {
+    const response = await fetch(`${API_BASE_URL}/api/analyze-text`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text, context, language })
+    });
+    return response.json();
+  },
+  
+  // Image analysis
+  analyzeImage: async (file: File, language: string = 'en', extractTextOnly: boolean = false) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('language', language);
+    formData.append('extract_text_only', extractTextOnly.toString());
+    
+    const response = await fetch(`${API_BASE_URL}/api/analyze-image`, {
+      method: 'POST',
+      body: formData
+    });
+    return response.json();
+  },
+  
+  // Research
+  research: async (query: string, maxResults: number = 5, language: string = 'en') => {
+    const response = await fetch(`${API_BASE_URL}/api/research`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query, max_results: maxResults, language })
+    });
+    return response.json();
+  }
+};
+```
+
+---
+
+## 📱 Detailed Tab Specifications
+
+### 1️⃣ Welcome Tab
+
+**Purpose:** Landing page with overview and quick navigation
+
+**Layout:**
+```
+┌─────────────────────────────────────────────┐
+│                                             │
+│     🏥 MediCare AI                          │
+│     Your AI-Powered Medical Assistant      │
+│     for Cameroon                           │
+│                                             │
+│     [Get Started] [Learn More]             │
+│                                             │
+├─────────────────────────────────────────────┤
+│                                             │
+│   ┌──────────┐  ┌──────────┐  ┌──────────┐ │
+│   │   💬     │  │   📄     │  │   🔬     │ │
+│   │  Chat    │  │ Analyze  │  │ Research │ │
+│   │          │  │          │  │          │ │
+│   └──────────┘  └──────────┘  └──────────┘ │
+│                                             │
+└─────────────────────────────────────────────┘
+```
+
+**Features:**
+- Large hero section with gradient background
+- Tagline: "Your AI-powered medical assistant for Cameroon"
+- 3 feature cards with icons and descriptions:
+  - **AI Chat:** "Get instant medical information"
+  - **Medical Analysis:** "Analyze your health records"
+  - **Research:** "Access credible medical sources"
+- Smooth fade-in animations on mount
+- Call-to-action buttons that navigate to respective tabs
+
+**Implementation Notes:**
+- Use `framer-motion` with `initial={{ opacity: 0, y: 20 }}` and `animate={{ opacity: 1, y: 0 }}`
+- Feature cards should have hover effects (scale, shadow increase)
+- Include a subtle gradient background: `bg-gradient-to-br from-primary-50 to-secondary-50`
+
+---
+
+### 2️⃣ Chat Tab
+
+**Purpose:** Conversational interface for medical Q&A
+
+**Layout:**
+```
+┌─────────────────────────────────────────────┐
+│  Language: [EN] [FR]                        │
+├─────────────────────────────────────────────┤
+│                                             │
+│  ┌──────────────────────────────────────┐  │
+│  │  🤖 AI: Hello! How can I help you    │  │
+│  │      with medical information today? │  │
+│  └──────────────────────────────────────┘  │
+│                                             │
+│         ┌────────────────────────────────┐ │
+│         │  👤 User: What are symptoms   │ │
+│         │      of malaria?              │ │
+│         └────────────────────────────────┘ │
+│                                             │
+│  ┌──────────────────────────────────────┐  │
+│  │  🤖 AI: Malaria symptoms include...  │  │
+│  └──────────────────────────────────────┘  │
+│                                             │
+├─────────────────────────────────────────────┤
+│  [Type your message here...] [Send 📤]     │
+└─────────────────────────────────────────────┘
+```
+
+**Features:**
+- Chat bubble UI (left-aligned for AI, right-aligned for user)
+- Language toggle at top (EN/FR) using shadcn Toggle Group
+- Auto-scroll to newest message
+- Loading indicator while AI is responding (three dots animation)
+- Message timestamp on hover
+- Input field with:
+  - Character counter (0/1000)
+  - Send button (disabled when empty or loading)
+  - Enter to send, Shift+Enter for new line
+- Starter questions/prompts below input:
+  - "What are malaria symptoms?"
+  - "How to treat typhoid fever?"
+  - "COVID-19 prevention tips"
+
+**State Management:**
+```typescript
+interface Message {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: Date;
+  language: string;
+}
+
+const [messages, setMessages] = useState<Message[]>([]);
+const [input, setInput] = useState('');
+const [isLoading, setIsLoading] = useState(false);
+const [language, setLanguage] = useState<'en' | 'fr'>('en');
+```
+
+**Implementation Notes:**
+- Use `useRef` for auto-scrolling to bottom
+- Display error toast if API fails
+- Show "AI is typing..." animation during loading
+- Store conversation in localStorage for persistence (optional)
+
+---
+
+### 3️⃣ Text Analysis Tab
+
+**Purpose:** Analyze medical records provided as text
+
+**Layout:**
+```
+┌─────────────────────────────────────────────┐
+│  Language: [EN] [FR]                        │
+├─────────────────────────────────────────────┤
+│  📄 Paste Your Medical Record               │
+│  ┌─────────────────────────────────────┐   │
+│  │ [Large textarea]                     │   │
+│  │ Patient: John Doe                    │   │
+│  │ Blood Pressure: 145/95...            │   │
+│  │                                      │   │
+│  └─────────────────────────────────────┘   │
+│                                             │
+│  Additional Context (optional)              │
+│  ┌─────────────────────────────────────┐   │
+│  │ [Smaller textarea]                   │   │
+│  └─────────────────────────────────────┘   │
+│                                             │
+│           [Analyze Record 🔍]               │
+│                                             │
+├─────────────────────────────────────────────┤
+│            ANALYSIS RESULTS                 │
+│                                             │
+│  ┌─────────────────────────────────────┐   │
+│  │ 📊 Summary                          │   │
+│  │ [Brief overview]                    │   │
+│  └─────────────────────────────────────┘   │
+│                                             │
+│  ┌─────────────────────────────────────┐   │
+│  │ 🔍 Key Findings                     │   │
+│  │ • Finding 1                         │   │
+│  │ • Finding 2                         │   │
+│  └─────────────────────────────────────┘   │
+│                                             │
+│  ┌─────────────────────────────────────┐   │
+│  │ 💡 Recommendations                  │   │
+│  │ • Recommendation 1                  │   │
+│  └─────────────────────────────────────┘   │
+│                                             │
+│  ┌─────────────────────────────────────┐   │
+│  │ ✅ Next Steps                       │   │
+│  │ • Action 1                          │   │
+│  └─────────────────────────────────────┘   │
+│                                             │
+│  ⚠️  DISCLAIMER: [Medical disclaimer]      │
+└─────────────────────────────────────────────┘
+```
+
+**Features:**
+- Large textarea (min height: 200px) for medical text
+- Optional context field (min height: 100px)
+- Character counter for both fields
+- "Analyze Record" button with loading spinner
+- Results displayed in 4 cards:
+  1. **Summary** - with 📊 icon
+  2. **Key Findings** - bulleted list with 🔍 icon
+  3. **Recommendations** - bulleted list with 💡 icon
+  4. **Next Steps** - bulleted list with ✅ icon
+- Prominent disclaimer banner at bottom (yellow/orange background)
+- "Copy Results" and "Download as PDF" buttons
+
+**Validation:**
+- Minimum text length: 10 characters
+- Show validation errors inline
+- Disable submit button when invalid
+
+**Implementation Notes:**
+- Use `react-hook-form` with `zod` validation
+- Animate results with staggered fade-in
+- Each card should be collapsible (optional)
+- Add sample medical text button for testing
+
+---
+
+### 4️⃣ Image Analysis Tab
+
+**Purpose:** Upload and analyze medical images
+
+**Layout:**
+```
+┌─────────────────────────────────────────────┐
+│  Language: [EN] [FR]                        │
+│  Mode: [Extract + Analyze] [Extract Only]  │
+├─────────────────────────────────────────────┤
+│                                             │
+│  ┌─────────────────────────────────────┐   │
+│  │     📤 Upload Medical Image          │   │
+│  │                                      │   │
+│  │  Drag & drop or click to browse     │   │
+│  │                                      │   │
+│  │  Supported: JPG, PNG, WebP          │   │
+│  │  Max size: 10MB                     │   │
+│  └─────────────────────────────────────┘   │
+│                                             │
+│  [Selected: prescription.jpg] [Change]      │
+│  [Preview thumbnail]                        │
+│                                             │
+│           [Analyze Image 🔍]                │
+│                                             │
+├─────────────────────────────────────────────┤
+│            EXTRACTED TEXT                   │
+│  ┌─────────────────────────────────────┐   │
+│  │ Patient Name: Jane Doe              │   │
+│  │ Prescription:                       │   │
+│  │ - Paracetamol 500mg...              │   │
+│  └─────────────────────────────────────┘   │
+│           [Copy Text] [Edit Text]           │
+│                                             │
+├─────────────────────────────────────────────┤
+│            ANALYSIS (if enabled)            │
+│  [Same card layout as Text Analysis]       │
+└─────────────────────────────────────────────┘
+```
+
+**Features:**
+- Drag-and-drop file upload zone (using `react-dropzone` or custom)
+- Image preview after selection
+- Toggle between:
+  - "Extract + Analyze" (default)
+  - "Extract Text Only" (faster)
+- File validation:
+  - Accept only images (JPEG, PNG, WebP, GIF)
+  - Max size: 10MB
+  - Show error for invalid files
+- Progress indicator during upload/processing
+- Two-section results:
+  1. **Extracted Text** - in a copyable code block
+  2. **Analysis** - same card layout as text analysis
+- "Edit Extracted Text" button to correct OCR errors and re-analyze
+
+**State Management:**
+```typescript
+interface ImageAnalysisState {
+  file: File | null;
+  preview: string | null;
+  extractedText: string;
+  analysis: AnalysisResponse | null;
+  isLoading: boolean;
+  mode: 'full' | 'extract-only';
+}
+```
+
+**Implementation Notes:**
+- Show image preview with zoom capability
+- Display file size and dimensions
+- Use `framer-motion` for upload zone highlight on drag over
+- Show step-by-step progress: Uploading → Extracting → Analyzing
+
+---
+
+### 5️⃣ Research Tab
+
+**Purpose:** Search medical research from credible sources
+
+**Layout:**
+```
+┌─────────────────────────────────────────────┐
+│  🔬 Medical Research Search                 │
+│  Language: [EN] [FR]                        │
+├─────────────────────────────────────────────┤
+│                                             │
+│  ┌─────────────────────────────────────┐   │
+│  │ Search medical topics...  [🔍]      │   │
+│  └─────────────────────────────────────┘   │
+│                                             │
+│  Max Results: [3] [5] [7] [10]             │
+│                                             │
+│  Popular Searches:                          │
+│  [#Malaria] [#Diabetes] [#Hypertension]    │
+│                                             │
+├─────────────────────────────────────────────┤
+│            AI SUMMARY                       │
+│  ┌─────────────────────────────────────┐   │
+│  │ 📝 Key Takeaways                    │   │
+│  │ Based on 5 trusted sources...       │   │
+│  └─────────────────────────────────────┘   │
+│                                             │
+├─────────────────────────────────────────────┤
+│            RESEARCH RESULTS                 │
+│                                             │
+│  ┌─────────────────────────────────────┐   │
+│  │ 1. Diabetes in Tropical Climates    │   │
+│  │    📊 Relevance: 95%                │   │
+│  │    🔗 pubmed.ncbi.nlm.nih.gov       │   │
+│  │    Managing diabetes in tropical... │   │
+│  │    [Read More →]                    │   │
+│  └─────────────────────────────────────┘   │
+│                                             │
+│  ┌─────────────────────────────────────┐   │
+│  │ 2. Heat Impact on Blood Sugar       │   │
+│  │    📊 Relevance: 89%                │   │
+│  │    🔗 nih.gov                       │   │
+│  │    Research shows that ambient...   │   │
+│  │    [Read More →]                    │   │
+│  └─────────────────────────────────────┘   │
+│                                             │
+└─────────────────────────────────────────────┘
+```
+
+**Features:**
+- Search input with autocomplete/suggestions (optional)
+- Radio buttons or select for max results (3, 5, 7, 10)
+- Popular search tags that populate search on click
+- AI-generated summary card at top (highlighted background)
+- Research result cards showing:
+  - Title (clickable, opens in new tab)
+  - Source domain with favicon
+  - Relevance score as percentage or progress bar
+  - Content excerpt (150-200 chars)
+  - "Read More" external link button
+- Source badges (PubMed, NIH, WHO, etc.) with icons
+- Loading skeleton for results
+- Empty state when no results found
+
+**Implementation Notes:**
+- Debounce search input (500ms)
+- Sort results by relevance score (highest first)
+- Highlight search query terms in results
+- Add "Share Results" functionality
+- Implement infinite scroll or pagination for many results
+
+---
+
+## 🎨 Shared Components
+
+### Language Toggle
+```typescript
+// Reusable across all tabs
+<LanguageToggle 
+  value={language} 
+  onChange={setLanguage} 
+/>
+```
+
+**Design:**
+- Toggle group with EN/FR options
+- Active state clearly highlighted
+- Position: Top right of each tab
+
+---
+
+### Analysis Result Cards
+```typescript
+interface AnalysisCardProps {
+  icon: React.ReactNode;
+  title: string;
+  items: string[];
+  variant?: 'default' | 'warning';
+}
+```
+
+**Design:**
+- White background with border
+- Icon + title header
+- Bulleted list body
+- Subtle shadow on hover
+- Collapsible (optional)
+
+---
+
+### Disclaimer Banner
+```typescript
+<DisclaimerBanner 
+  text="This analysis is for informational purposes only. Always consult qualified healthcare professionals for medical advice."
+/>
+```
+
+**Design:**
+- Orange/yellow background (#FEF3C7)
+- Warning icon
+- Border on left side
+- Visible but not alarming
+
+---
+
+### Loading States
+- **Full page:** Centered spinner with "Loading MediCare AI..."
+- **Button:** Spinner inside button, button disabled
+- **Results:** Skeleton cards with pulsing animation
+- **Chat:** Three dots animation "AI is typing..."
+
+---
+
+## 🎭 Animations & Interactions
+
+### Page Transitions
+```typescript
+// Framer Motion variants
+const tabVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    transition: { duration: 0.4, ease: 'easeOut' }
+  },
+  exit: { 
+    opacity: 0, 
+    y: -20,
+    transition: { duration: 0.3 }
+  }
+};
+```
+
+### Hover Effects
+- Cards: `hover:shadow-lg hover:scale-[1.02]`
+- Buttons: `hover:brightness-110`
+- Links: `hover:text-primary-600 hover:underline`
+
+### Loading Animations
+- Spinner: Rotate 360deg infinite
+- Skeleton: Pulse opacity 0.5 → 1
+- Progress bar: Animated width increase
+
+---
+
+## 📱 Responsive Design
+
+### Breakpoints
+```typescript
+// Tailwind breakpoints
+sm: 640px   // Mobile landscape
+md: 768px   // Tablet
+lg: 1024px  // Desktop
+xl: 1280px  // Large desktop
+```
+
+### Mobile Adaptations
+- Stack cards vertically on mobile
+- Hamburger menu for tab navigation on small screens
+- Full-width inputs and buttons
+- Reduced padding and font sizes
+- Touch-friendly button sizes (min 44px height)
+
+---
+
+## ♿ Accessibility
+
+### Requirements
+- Semantic HTML (`<main>`, `<nav>`, `<article>`)
+- ARIA labels for all interactive elements
+- Keyboard navigation support (Tab, Enter, Escape)
+- Focus visible styles (ring-2 ring-primary)
+- Alt text for all images
+- Color contrast ratio ≥ 4.5:1 for text
+- Screen reader announcements for dynamic content
+
+---
+
+## 🚀 Performance
+
+### Optimization Strategies
+- Lazy load tab components
+- Debounce search inputs
+- Memoize expensive computations
+- Code splitting by route
+- Optimize images (next/image)
+- Cache API responses (React Query or SWR)
+
+### Loading Strategy
+```typescript
+// Check API health on mount
+useEffect(() => {
+  apiClient.healthCheck()
+    .then(() => setApiStatus('online'))
+    .catch(() => setApiStatus('offline'));
+}, []);
+```
+
+---
+
+## 🧪 Testing Guidance
+
+### Component Tests
+- Test each tab renders correctly
+- Test form validation
+- Test API calls with mock responses
+- Test error handling
+- Test language switching
+
+### Integration Tests
+- Test full user flows:
+  - Chat conversation
+  - Text analysis submission
+  - Image upload and analysis
+  - Research search
+
+---
+
+## 📦 Deployment Checklist
+
+- [ ] Environment variables configured
+- [ ] API URL points to production
+- [ ] Error boundaries implemented
+- [ ] Analytics integration (optional)
+- [ ] SEO meta tags added
+- [ ] Favicon and app icons
+- [ ] Loading states for slow connections
+- [ ] Offline fallback message
+- [ ] CORS headers verified
+- [ ] Mobile tested on real devices
+
+---
+
+## 🎁 Bonus Features (Optional)
+
+1. **Dark Mode Toggle**
+   - Use `next-themes` for theme switching
+   - Respect system preferences
+
+2. **Chat History**
+   - Save conversations to localStorage
+   - "Clear History" button
+
+3. **PDF Export**
+   - Export analysis results as PDF
+   - Use `jsPDF` or `react-pdf`
+
+4. **Voice Input**
+   - Web Speech API for voice-to-text
+   - Available in chat and text input
+
+5. **Multi-language UI**
+   - Translate entire UI to French
+   - Use `next-intl` or `i18next`
+
+6. **Onboarding Tour**
+   - First-time user guide
+   - Use `react-joyride` or `intro.js`
+
+7. **Feedback System**
+   - Thumbs up/down on AI responses
+   - Report issues button
+
+---
+
+## 🎯 Success Criteria
+
+Your frontend is complete when:
+
+✅ All 5 tabs are functional and connected to API  
+✅ Error handling works gracefully  
+✅ Loading states provide clear feedback  
+✅ Disclaimers are prominently displayed  
+✅ Mobile responsive on phones and tablets  
+✅ Keyboard navigation works smoothly  
+✅ Color contrast meets WCAG standards  
+✅ API calls handle cold starts (60s timeout)  
+✅ Language toggle affects all features  
+✅ UI feels trustworthy and professional  
+
+---
+
+## 🔥 Final Prompt for AI Code Generation
+
+**Use this condensed version for Cursor/v0:**
+
+> Create a Next.js 14 + TypeScript + TailwindCSS + shadcn/ui application for MediCare AI. Build 5 tabs: Welcome (hero + feature cards), Chat (bubble UI with EN/FR toggle), Text Analysis (textarea + 4-card results), Image Analysis (drag-drop upload + OCR + analysis), and Research (search bar + credible sources + AI summary). Use API_BASE_URL = `https://medicare-ai-4.onrender.com`. Color palette: primary #2563EB, secondary #0EA5E9, accent #14B8A6. Include loading spinners, error toasts, disclaimers, and framer-motion animations. Mobile responsive. Match the detailed specifications in the full documentation above.
+
+---
+
+**Last Updated:** October 3, 2025  
+**Status:** Ready for Implementation 🚀
